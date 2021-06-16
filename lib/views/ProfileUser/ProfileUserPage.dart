@@ -1,13 +1,21 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:reportapp/component/AppBar/Indicator/IndicatorLoad.dart';
+import 'package:reportapp/config/globalKeySharedPref.dart';
+import 'package:reportapp/provider/UserProvider.dart';
 
 import 'package:reportapp/theme/PaletteColor.dart';
 import 'package:reportapp/theme/SpacingDimens.dart';
 import 'package:reportapp/theme/TypographyStyle.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileUserPage extends StatefulWidget {
+
+  final String idUser;
+
+  ProfileUserPage({ this.idUser});
+
   @override
   _ProfileUserPageState createState() => _ProfileUserPageState();
 }
@@ -51,12 +59,14 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
-//  navigateTo(BuildContext context, target) {
-//    Navigator.push(
-//      context,
-//      rightToLeftTransition(target),
-//    );
-//  }
+
+  Future getPrefData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String idUser = preferences.getString(GlobalKeySharedPref.idUser);
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -83,78 +93,62 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
           horizontal: SpacingDimens.spacing24,
           vertical: SpacingDimens.spacing24,
         ),
-        child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-//              Center(
-//                child: isPhotoNull
-//                    ? Consumer<UsersProvider>(
-//                  builder: (context, dataUser, _) {
-//                    return CircleAvatar(
-//                      backgroundColor: PaletteColor.grey40,
-//                      radius: SpacingDimens.spacing32,
-//                      child: Text(
-//                        dataUser.user.data.nama[0].capitalize(),
-//                        style: TypographyStyle.title.merge(
-//                          TextStyle(
-//                            fontSize: SpacingDimens.spacing32,
-//                          ),
-//                        ),
-//                      ),
-//                    );
-//                  },
-//                )
-//                    : Consumer<UsersProvider>(
-//                  builder: (context, dataUser, _) {
-//                    return CachedNetworkImage(
-//                      imageUrl: dataUser.photo,
-//                      placeholder: (context, url) => indicatorLoad(),
-//                      imageBuilder: (context, images) {
-//                        return CircleAvatar(
-//                          radius: SpacingDimens.spacing64,
-//                          backgroundImage: images,
-//                          backgroundColor: Colors.transparent,
-//                        );
-//                      },
-//                    );
-//                  },
-//                ),
-//              ),
-              SizedBox(
-                height: SpacingDimens.spacing64,
-              ),
-              Divider(
-                color: PaletteColor.grey60,
-                height: 1,
-              ),
-//              Consumer<UsersProvider>(
-//                builder: (context, dataUsers, _) {
-//                  return _biodataField(
-//                    "Nama",
-//                    dataUsers.user.data.nama == null
-//                        ? "-"
-//                        : dataUsers.user.data.nama.capitalize(),
-//                  );
-//                },
-//              ),
-//              Consumer<UsersProvider>(
-//                builder: (context, dataUsers, _) {
-//                  return _biodataField(
-//                    "Email",
-//                    dataUsers.user.data.userCredentials.email == null
-//                        ? "-"
-//                        : dataUsers.user.data.userCredentials.email
-//                        .capitalize(),
-//                  );
-//                },
-//              ),
-
-            ],
-          ),
-        ),
+     child: FutureBuilder(
+       future: Future.wait([
+         Provider.of<UsersProvider>(context,listen: false).getUserDetail(
+           widget.idUser
+         )
+       ]),
+       builder: (context,snapshot){
+         if (snapshot.connectionState == ConnectionState.waiting) {
+           return Center(
+             child: indicatorLoad(),
+           );
+         }
+         return Consumer<UsersProvider>(
+           builder: (context,dataUser,_){
+             return SingleChildScrollView(
+               physics: BouncingScrollPhysics(),
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 mainAxisAlignment: MainAxisAlignment.start,
+                 children: [
+                   Center(
+                       child: CircleAvatar(
+                         backgroundColor: PaletteColor.grey40,
+                         radius: SpacingDimens.spacing32,
+                         child: Text(
+                           dataUser.userDetail.data.namaPetugas[0].toUpperCase(),
+                           style: TypographyStyle.title.merge(
+                             TextStyle(
+                               fontSize: SpacingDimens.spacing32,
+                             ),
+                           ),
+                         ),
+                       ),
+                   ),
+                   SizedBox(
+                     height: SpacingDimens.spacing16,
+                   ),
+                   Center(child: Text(dataUser.userDetail.data.namaPetugas)),
+                   SizedBox(
+                     height: SpacingDimens.spacing44,
+                   ),
+                   Divider(
+                     color: PaletteColor.grey60,
+                     height: 1,
+                   ),
+                   _biodataField("Username", dataUser.userDetail.data.username),
+                   _biodataField("Nama Instansi", dataUser.userDetail.data.instansi.namaInstansi),
+                   _biodataField("Alamat Instansi", dataUser.userDetail.data.instansi.alamat),
+                   _biodataField("Kontak Instansi", dataUser.userDetail.data.instansi.kontak)
+                 ],
+               ),
+             );
+           },
+         );
+       },
+     )
       ),
     );
   }

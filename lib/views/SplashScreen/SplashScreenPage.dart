@@ -23,13 +23,15 @@ class _SplashScreenState extends State<SplashScreenPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isHasLogined =
         prefs.getBool(GlobalKeySharedPref.statusLogin) ?? false;
-    String username = prefs.getString(GlobalKeySharedPref.idUser);
-    print(username);
+    String idUser = prefs.getString(GlobalKeySharedPref.idUser);
+    print(idUser);
 
     if (isHasLogined) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => DasboardPage(),
+          builder: (context) => DasboardPage(
+            idUser: idUser,
+          ),
         ),
       );
     } else {
@@ -43,6 +45,8 @@ class _SplashScreenState extends State<SplashScreenPage> {
     print(isHasLogined);
     return isHasLogined;
   }
+
+
 
   @override
   void initState() {
@@ -60,7 +64,7 @@ class _SplashScreenState extends State<SplashScreenPage> {
           Container(
             alignment: Alignment.center,
             child: Image.asset(
-              "assets/images/logo 1.png",
+              "assets/images/logo.png",
               height: 130,
             ),
           ),
