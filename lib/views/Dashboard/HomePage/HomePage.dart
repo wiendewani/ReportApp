@@ -75,6 +75,7 @@ class HomePage extends StatelessWidget {
                       );
                     },
                   )),
+              SizedBox(height: SpacingDimens.spacing16,),
               FutureBuilder(
                 future: Future.wait([
                   Provider.of<UsersProvider>(context, listen: false).getUsers()

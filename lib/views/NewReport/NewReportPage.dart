@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reportapp/component/AppBar/Indicator/IndicatorLoad.dart';
 import 'package:reportapp/provider/ReportProvider.dart';
@@ -10,6 +11,8 @@ import 'package:reportapp/theme/PaletteColor.dart';
 import 'package:reportapp/theme/SpacingDimens.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reportapp/theme/TypographyStyle.dart';
+import 'package:reportapp/utils/FieldReport.dart';
+import 'package:reportapp/views/NewReport/UploadFotoTile.dart';
 
 class NewReportPage extends StatefulWidget {
   @override
@@ -26,7 +29,14 @@ class _NewReportPageState extends State<NewReportPage> {
   final TextEditingController _tindakLanjutController =
       new TextEditingController();
 
-  List _listGender = ["Kominfo Kota Malang", "Irfak Wahyudi","A. Yahya Hudan","Muhammad Andy","Abdullah Winasis","Hendra Danang"];
+  List _listGender = [
+    "Kominfo Kota Malang",
+    "Irfak Wahyudi",
+    "A. Yahya Hudan",
+    "Muhammad Andy",
+    "Abdullah Winasis",
+    "Hendra Danang"
+  ];
   String _valGender;
   String urlPhoto;
   bool isPhotoNull;
@@ -34,87 +44,70 @@ class _NewReportPageState extends State<NewReportPage> {
   File _image;
   final picker = ImagePicker();
   bool _load = false;
+  final DateFormat dateFormat = DateFormat('EEEE, dd MMMM yyyy',"id_ID");
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   loadOn() => setState(() => _load = true);
 
   loadOff() => setState(() => _load = false);
 
+
   void sendPengajuanMasjid() {
     loadOn();
-    var userProvider = Provider.of<UsersProvider>(context, listen: false);
+    Map<String, String> data = new Map();
+    data[FieldPengajuan.id_user] = "6";
+    data[FieldPengajuan.kejadian] = _kejadianController.text;
+    data[FieldPengajuan.lokasi_kejadian] = _alamatController.text;
+    data[FieldPengajuan.tanggal] = dateFormat.format(selectedDate);
+    data[FieldPengajuan.petugas] = _valGender;
+    data[FieldPengajuan.nama_pelapor] = _pelaporController.text;
+    data[FieldPengajuan.tindak_lanjut] = _tindakLanjutController.text;
 
-    Provider.of<ReportProvider>(context, listen: false).postReport(
-      id_user:"8",
-      nama_pelapor:_pelaporController.text,
-      kejadian: _kejadianController.text,
-      lokasi_kejadian:  _alamatController.text,
-      petugas: _valGender,
-      tanggal: _tanggalController.text,
-      tindak_lanjut: _tindakLanjutController.text,
-      dokumentasi: _image
-    ).then((value) {
-      print(value);
-      if(value==200){
+    Provider.of<ReportProvider>(context, listen: false)
+        .postReport(
+        data: data).then((value) {
+      if (value == 200) {
+        loadOff();
         Navigator.pop(context);
-        print("data berhasil dikirim");
+      } else {
+        loadOff();
+        showSnackbar('Gagal Mengirim Data');
       }
-      loadOff();
-
     });
-    print(_image);
+
+  print(FieldPengajuan.dokumentasi);
   }
 
-  _imgFromCamera() async {
-    File image = await ImagePicker.pickImage(
-        source: ImageSource.camera, imageQuality: 50
+
+  void showSnackbar(String content) {
+    final snackBar = SnackBar(
+      content: Text(content),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {},
+      ),
     );
-
-    setState(() {
-      _image = image;
-    });
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  _imgFromGallery() async {
-    File image = await  ImagePicker.pickImage(
-        source: ImageSource.gallery, imageQuality: 50
-    );
 
-    setState(() {
-      _image = image;
-    });
-  }
+  DateTime selectedDate = DateTime.now();
 
-  void _showPicker(context) {
-    showModalBottomSheet(
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
         context: context,
-        builder: (BuildContext bc) {
-          return SafeArea(
-            child: Container(
-              child: new Wrap(
-                children: <Widget>[
-                  new ListTile(
-                      leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
-                      onTap: () {
-                        _imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
-                  new ListTile(
-                    leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
-                    onTap: () {
-                      _imgFromCamera();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-    );
+        initialDate: selectedDate,
+        initialDatePickerMode: DatePickerMode.day,
+        firstDate: DateTime(2015),
+        lastDate: DateTime(2101));
+    if (picked != null)
+      setState(() {
+        selectedDate = picked;
+        _tanggalController.text = DateFormat.yMd().format(selectedDate);
+      });
   }
+
+
 
   @override
   void initState() {
@@ -222,7 +215,9 @@ class _NewReportPageState extends State<NewReportPage> {
     return Stack(
       children: [
         Scaffold(
+
           appBar: AppBar(
+            backgroundColor: PaletteColor.primary,
             title: Text(
               'Report Page',
               style: TypographyStyle.subtitle0.merge(
@@ -259,44 +254,49 @@ class _NewReportPageState extends State<NewReportPage> {
                     SizedBox(
                       height: SpacingDimens.spacing8,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        _showPicker(context);
-                      },
-                      child: CircleAvatar(
-                        radius: 55,
-                        backgroundColor: Color(0xffFDCF09),
-                        child: _image != null
-                            ? ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          child: Image.file(
-                            _image,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.fitHeight,
-                          ),
-                        )
-                            : Container(
-                          decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(50)),
-                          width: 100,
-                          height: 100,
-                          child: Icon(
-                            Icons.camera_alt,
-                            color: Colors.grey[800],
+                    UploadFotoTile(
+                      isEnableUpload: true,
+                    ),
+
+                    SizedBox(
+                      height: SpacingDimens.spacing36,
+                    ),
+
+                    Container(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        "Tanggal",
+                        style: TypographyStyle.mini.merge(
+                          TextStyle(
+                            color: PaletteColor.grey60,
                           ),
                         ),
                       ),
                     ),
-                    _editField(
-                      title: "Tanggal",
-                      hint: "Masukkan No. Telepon",
-                      type: TextInputType.number,
-                      controller: _tanggalController,
-                      isEnable: true,
-                      isMandatory: true,
+                    SizedBox(
+                      height: SpacingDimens.spacing16,
                     ),
+
+                    Row(
+                     children: [
+
+                       Container(
+                         padding: EdgeInsets.only(right: SpacingDimens.spacing16),
+                         child: Text(
+                           dateFormat.format(selectedDate),
+                         ),
+                       ),
+
+                       InkWell(
+                           onTap: () {
+                             _selectDate(context);
+                           },
+                           child: Icon(Icons.calendar_today_outlined, color: PaletteColor.primary,)
+                       ),
+                     ],
+                    ),
+
+
                     _editField(
                       title: "Kejadian",
                       hint: "Masukkan Kejadian",
@@ -323,10 +323,10 @@ class _NewReportPageState extends State<NewReportPage> {
                       width: double.infinity,
                       child: DropdownButton(
                         isExpanded: true,
-                        hint: Text("Nama Petugas"),
+                        hint: Text("Jenis Kelamin"),
                         value: _valGender,
                         items: _listGender.map(
-                          (e) {
+                              (e) {
                             return DropdownMenuItem(
                               child: Text(e),
                               value: e,
@@ -340,7 +340,6 @@ class _NewReportPageState extends State<NewReportPage> {
                         },
                       ),
                     ),
-
                     _editField(
                       title: "Nama Pelapor",
                       hint: "Masukkan Nama Pelapor",
@@ -463,6 +462,4 @@ class _NewReportPageState extends State<NewReportPage> {
   void navigatePopUp() {
     Navigator.pop(context);
   }
-
-
 }
