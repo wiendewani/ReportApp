@@ -25,6 +25,7 @@ class _UploadFotoTileState extends State<UploadFotoTile> {
   @override
   void initState() {
     provider = Provider.of<ReportProvider>(context, listen: false);
+    provider.images.clear();
     super.initState();
   }
 
@@ -167,7 +168,7 @@ class _UploadFotoTileState extends State<UploadFotoTile> {
                 ),
                 GestureDetector(
                   onTap: widget.isEnableUpload ? () => _showPicker(context) : (){},
-                  child: provider.images.length < 5
+                  child: provider.images.length <1
                       ? Padding(
                           padding: const EdgeInsets.all(
                             SpacingDimens.spacing8,

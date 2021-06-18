@@ -25,8 +25,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
   @override
   void initState() {
-//    var userProvider = Provider.of<UsersProvider>(context, listen: false);
-//    isPhotoNull = userProvider.photo.endsWith("storage/images/users/");
     super.initState();
   }
 

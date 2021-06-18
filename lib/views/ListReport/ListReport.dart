@@ -5,6 +5,7 @@ import 'package:reportapp/component/AppBar/Animation/RightToLeftTransition.dart'
 
 import 'package:reportapp/provider/ReportProvider.dart';
 import 'package:reportapp/theme/PaletteColor.dart';
+import 'package:reportapp/theme/TypographyStyle.dart';
 
 import 'package:reportapp/views/DetailReport/DetailReportPage.dart';
 import 'package:reportapp/views/ListReport/ListReportTile.dart';
@@ -25,6 +26,10 @@ class _ListReportState extends State<ListReport> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: PaletteColor.primary,
+        title: Text("Daftar Report",style: TypographyStyle.subtitle0.merge(TextStyle(color: PaletteColor.primarybg)),),
+      ),
       body: Consumer<ReportProvider>(
         builder: (context, dataReport, _) {
           return ListView.builder(

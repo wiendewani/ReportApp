@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: PaletteColor.primary,
-        title: Text("Dashboard"),
+        title: Text("Dashboard",style: TypographyStyle.subtitle0.merge(TextStyle(color: PaletteColor.primarybg))),
       ),
       body: SingleChildScrollView(
         child: Center(

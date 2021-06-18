@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reportapp/component/AppBar/Indicator/IndicatorLoad.dart';
+import 'package:reportapp/config/globalKeySharedPref.dart';
 import 'package:reportapp/provider/ReportProvider.dart';
 import 'package:reportapp/provider/UserProvider.dart';
 import 'package:reportapp/theme/PaletteColor.dart';
@@ -13,6 +14,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reportapp/theme/TypographyStyle.dart';
 import 'package:reportapp/utils/FieldReport.dart';
 import 'package:reportapp/views/NewReport/UploadFotoTile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewReportPage extends StatefulWidget {
   @override
@@ -41,7 +43,6 @@ class _NewReportPageState extends State<NewReportPage> {
   String urlPhoto;
   bool isPhotoNull;
   bool isChange;
-  File _image;
   final picker = ImagePicker();
   bool _load = false;
   final DateFormat dateFormat = DateFormat('EEEE, dd MMMM yyyy',"id_ID");
@@ -50,18 +51,23 @@ class _NewReportPageState extends State<NewReportPage> {
   loadOn() => setState(() => _load = true);
 
   loadOff() => setState(() => _load = false);
+  UsersProvider userProvider;
 
 
-  void sendPengajuanMasjid() {
+
+
+  void sendPengajuanMasjid() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String idUser = prefs.getString(GlobalKeySharedPref.idUser);
     loadOn();
     Map<String, String> data = new Map();
-    data[FieldPengajuan.id_user] = "6";
     data[FieldPengajuan.kejadian] = _kejadianController.text;
     data[FieldPengajuan.lokasi_kejadian] = _alamatController.text;
-    data[FieldPengajuan.tanggal] = dateFormat.format(selectedDate);
+    data[FieldPengajuan.tanggal] = selectedDate.toString();
     data[FieldPengajuan.petugas] = _valGender;
     data[FieldPengajuan.nama_pelapor] = _pelaporController.text;
     data[FieldPengajuan.tindak_lanjut] = _tindakLanjutController.text;
+    data[FieldPengajuan.id_user] = idUser;
 
     Provider.of<ReportProvider>(context, listen: false)
         .postReport(
@@ -75,7 +81,7 @@ class _NewReportPageState extends State<NewReportPage> {
       }
     });
 
-  print(FieldPengajuan.dokumentasi);
+
   }
 
 
@@ -111,17 +117,7 @@ class _NewReportPageState extends State<NewReportPage> {
 
   @override
   void initState() {
-//    Users users = Provider.of<UsersProvider>(context, listen: false).user;
-//    _tiketController.text = users.data.nama;
-//    _tanggalController.text = users.data.userCredentials.noTelp;
-//    _emailController.text = users.data.userCredentials.email;
-//    _pelaporController.text = users.data.alamat;
-//    _valGender = users.data.jenisKelamin;
-//    String url =
-//        Provider.of<UsersProvider>(context, listen: false).user.data.foto;
-//    urlPhoto = GlobalConfigUrl.baseUrl + url;
-//    isPhotoNull = url.endsWith("storage/images/users/");
-    isChange = false;
+    userProvider = Provider.of<UsersProvider>(context, listen: false);
     super.initState();
   }
 
@@ -131,6 +127,9 @@ class _NewReportPageState extends State<NewReportPage> {
     _tanggalController.dispose();
     _emailController.dispose();
     _pelaporController.dispose();
+    _tindakLanjutController.dispose();
+    _kejadianController.dispose();
+    _alamatController.dispose();
     super.dispose();
   }
 
@@ -323,7 +322,7 @@ class _NewReportPageState extends State<NewReportPage> {
                       width: double.infinity,
                       child: DropdownButton(
                         isExpanded: true,
-                        hint: Text("Jenis Kelamin"),
+                        hint: Text("Pilih Petugas", style: TypographyStyle.paragraph,),
                         value: _valGender,
                         items: _listGender.map(
                               (e) {

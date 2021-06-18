@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reportapp/component/AppBar/AppBarBack.dart';
 import 'package:reportapp/config/globalConfigUrl.dart';
@@ -11,6 +12,7 @@ import 'package:reportapp/theme/TypographyStyle.dart';
 class DetailReportPage extends StatelessWidget {
   final String idReport;
   bool isPhotoNull;
+  final DateFormat dateFormat = DateFormat('EEEE, dd MMMM yyyy',"id_ID");
 
   DetailReportPage({this.idReport});
 
@@ -72,7 +74,7 @@ class DetailReportPage extends StatelessWidget {
                         ),
                         contentDetails(
                           title: "Tanggal",
-                          desc: item.tanggal.toString(),
+                          desc: dateFormat.format(item.tanggal),
                         ),
                         contentDetails(
                           title: "Lokasi Kejadian",
