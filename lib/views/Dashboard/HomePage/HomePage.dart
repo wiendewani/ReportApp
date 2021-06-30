@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reportapp/component/AppBar/Indicator/IndicatorLoad.dart';
 import 'package:reportapp/provider/ReportProvider.dart';
@@ -8,12 +9,19 @@ import 'package:reportapp/theme/SpacingDimens.dart';
 import 'package:reportapp/theme/TypographyStyle.dart';
 
 class HomePage extends StatelessWidget {
+  final DateFormat dateFormat = DateFormat('EEEE, dd MMMM yyyy ', "id_ID");
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: PaletteColor.primary,
-        title: Text("Dashboard",style: TypographyStyle.subtitle0.merge(TextStyle(color: PaletteColor.primarybg))),
+        title: Padding(
+          padding: const EdgeInsets.only(left: SpacingDimens.spacing12),
+          child: Text("Dashboard",
+              style: TypographyStyle.subtitle0
+                  .merge(TextStyle(color: PaletteColor.primarybg))),
+        ),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -27,55 +35,102 @@ class HomePage extends StatelessWidget {
                   "assets/images/image2.png",
                 ),
               ),
-              Container(
-                  margin:
-                      EdgeInsets.symmetric(horizontal: SpacingDimens.spacing24),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: PaletteColor.yellow, width: 3),
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  child: FutureBuilder(
-                    future: Future.wait([
-                      Provider.of<ReportProvider>(context, listen: false)
-                          .getReport()
-                    ]),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return indicatorLoad();
-                      }
-                      return Consumer<ReportProvider>(
-                        builder: (context, dataUser, _) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: SpacingDimens.spacing12),
-                                alignment: Alignment.center,
-                                width: double.infinity,
-                                child: Text(
-                                  "Total Report",
-                                  style: TypographyStyle.subtitle1,
+
+              FutureBuilder(
+                future: Future.wait([
+                  Provider.of<ReportProvider>(context, listen: false).getReport()
+                ]),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return indicatorLoad();
+                  }
+
+                  return Consumer<ReportProvider>(
+                    builder: (context, dataReport, _) {
+                      return Column(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: SpacingDimens.spacing24),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border:
+                              Border.all(color: PaletteColor.yellow, width: 3),
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: SpacingDimens.spacing12),
+                                  alignment: Alignment.center,
+                                  width: double.infinity,
+                                  child: Text(
+                                    "Terakhir Update Report",
+                                    style: TypographyStyle.subtitle1,
+                                  ),
+                                  color: PaletteColor.yellow,
                                 ),
-                                color: PaletteColor.yellow,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: SpacingDimens.spacing16),
-                                child: Text(
-                                  dataUser.responeReport.data.length.toString(),
-                                  style: TypographyStyle.title
-                                      .merge(TextStyle(fontSize: 70.0)),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: SpacingDimens.spacing16),
+                                  child: Text(
+                                    dateFormat.format(dataReport.responeReport.data[0].tanggal),
+                                    style: TypographyStyle.title
+                                        .merge(TextStyle(fontSize: 18.0)),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: SpacingDimens.spacing16,
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: SpacingDimens.spacing24),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border:
+                              Border.all(color: PaletteColor.yellow, width: 3),
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: SpacingDimens.spacing12),
+                                  alignment: Alignment.center,
+                                  width: double.infinity,
+                                  child: Text(
+                                    "Total Report",
+                                    style: TypographyStyle.subtitle1,
+                                  ),
+                                  color: PaletteColor.yellow,
                                 ),
-                              )
-                            ],
-                          );
-                        },
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: SpacingDimens.spacing16),
+                                  child: Text(
+                                    dataReport.responeReport.data.length.toString(),
+                                    style: TypographyStyle.title
+                                        .merge(TextStyle(fontSize: 70.0)),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
                       );
                     },
-                  )),
-              SizedBox(height: SpacingDimens.spacing16,),
+                  );
+                },
+              ),
+              SizedBox(
+                height: SpacingDimens.spacing16,
+              ),
               FutureBuilder(
                 future: Future.wait([
                   Provider.of<UsersProvider>(context, listen: false).getUsers()
@@ -88,11 +143,12 @@ class HomePage extends StatelessWidget {
                   return Consumer<UsersProvider>(
                     builder: (context, dataUser, _) {
                       return Container(
-                        margin:
-                        EdgeInsets.symmetric(horizontal: SpacingDimens.spacing24),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: SpacingDimens.spacing24),
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          border: Border.all(color: PaletteColor.yellow, width: 3),
+                          border:
+                              Border.all(color: PaletteColor.yellow, width: 3),
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                         child: Column(
@@ -125,7 +181,6 @@ class HomePage extends StatelessWidget {
                   );
                 },
               ),
-
             ],
           ),
         ),

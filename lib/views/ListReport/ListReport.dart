@@ -5,6 +5,7 @@ import 'package:reportapp/component/AppBar/Animation/RightToLeftTransition.dart'
 
 import 'package:reportapp/provider/ReportProvider.dart';
 import 'package:reportapp/theme/PaletteColor.dart';
+import 'package:reportapp/theme/SpacingDimens.dart';
 import 'package:reportapp/theme/TypographyStyle.dart';
 
 import 'package:reportapp/views/DetailReport/DetailReportPage.dart';
@@ -28,7 +29,10 @@ class _ListReportState extends State<ListReport> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: PaletteColor.primary,
-        title: Text("Daftar Report",style: TypographyStyle.subtitle0.merge(TextStyle(color: PaletteColor.primarybg)),),
+        title: Padding(
+          padding: const EdgeInsets.only(left: SpacingDimens.spacing12),
+          child: Text("Daftar Report",style: TypographyStyle.subtitle0.merge(TextStyle(color: PaletteColor.primarybg)),),
+        ),
       ),
       body: Consumer<ReportProvider>(
         builder: (context, dataReport, _) {

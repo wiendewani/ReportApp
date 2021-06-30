@@ -61,7 +61,7 @@ class ListReportTile extends StatelessWidget {
                   ),
                   Text(
                     "$judul",
-                    style: TypographyStyle.mini,
+                    style: TypographyStyle.paragraph.merge(TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   SizedBox(
                     height: SpacingDimens.spacing8,

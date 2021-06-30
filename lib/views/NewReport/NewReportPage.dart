@@ -356,7 +356,7 @@ class _NewReportPageState extends State<NewReportPage> {
                       isMandatory: true,
                     ),
                     _editField(
-                      title: "Alamat",
+                      title: "Lokasi Kejadian",
                       hint: "Masukkan Alamat",
                       type: TextInputType.streetAddress,
                       controller: _alamatController,

@@ -58,30 +58,21 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   }
 
 
-  Future getPrefData() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String idUser = preferences.getString(GlobalKeySharedPref.idUser);
-
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Profle Page',
-          style: TypographyStyle.subtitle0.merge(
-            TextStyle(
-              color: PaletteColor.primarybg,
+        backgroundColor: PaletteColor.primary,
+        title: Padding(
+          padding: const EdgeInsets.only(left: SpacingDimens.spacing12),
+          child: Text(
+            'Profle Page',
+            style: TypographyStyle.subtitle0.merge(
+              TextStyle(
+                color: PaletteColor.primarybg,
+              ),
             ),
-          ),
-        ),
-        leading: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Icon(
-            Icons.arrow_back,
           ),
         ),
 
