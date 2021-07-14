@@ -44,10 +44,14 @@ class HomePage extends StatelessWidget {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return indicatorLoad();
                   }
-
+                  else if(snapshot.hasError){
+                    return Center(
+                      child: indicatorLoad(),
+                    );
+                  }
                   return Consumer<ReportProvider>(
                     builder: (context, dataReport, _) {
-                      return Column(
+                      return dataReport != null ? Column(
                         children: [
                           Container(
                             margin: EdgeInsets.symmetric(
@@ -123,6 +127,8 @@ class HomePage extends StatelessWidget {
                             ),
                           ),
                         ],
+                      ): Center(
+                        child: CircularProgressIndicator(),
                       );
                     },
                   );
@@ -138,6 +144,11 @@ class HomePage extends StatelessWidget {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return indicatorLoad();
+                  }
+                  else if(snapshot.hasError){
+                    return Center(
+                      child: indicatorLoad(),
+                    );
                   }
 
                   return Consumer<UsersProvider>(

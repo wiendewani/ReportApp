@@ -94,11 +94,17 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
              child: indicatorLoad(),
            );
          }
+         else if(snapshot.hasError){
+           return Center(
+             child: indicatorLoad(),
+           );
+         }
+
          return Consumer<UsersProvider>(
            builder: (context,dataUser,_){
              return SingleChildScrollView(
                physics: BouncingScrollPhysics(),
-               child: Column(
+               child: dataUser != null ? Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  mainAxisAlignment: MainAxisAlignment.start,
                  children: [
@@ -132,7 +138,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                    _biodataField("Alamat Instansi", dataUser.userDetail.data.instansi.alamat),
                    _biodataField("Kontak Instansi", dataUser.userDetail.data.instansi.kontak)
                  ],
-               ),
+               ):
+                   Center(
+                     child: Text("Tidak ada internet"),
+                   )
              );
            },
          );
