@@ -8,7 +8,19 @@ import 'package:reportapp/theme/PaletteColor.dart';
 import 'package:reportapp/theme/SpacingDimens.dart';
 import 'package:reportapp/theme/TypographyStyle.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  Future _reportFuture;
+  @override
+  void initState() {
+    _reportFuture = Provider.of<ReportProvider>(context, listen: false).getReport();
+    super.initState();
+  }
   final DateFormat dateFormat = DateFormat('EEEE, dd MMMM yyyy ', "id_ID");
 
   @override
@@ -37,18 +49,25 @@ class HomePage extends StatelessWidget {
               ),
 
               FutureBuilder(
-                future: Future.wait([
-                  Provider.of<ReportProvider>(context, listen: false).getReport()
-                ]),
+                future: _reportFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return indicatorLoad();
+                    return Center(
+                      child: indicatorLoad(),
+                    );
+                  }
+                  else if(snapshot.connectionState == ConnectionState.none){
+                    print("nanana");
+                    return Center(
+                      child: indicatorLoad(),
+                    );
                   }
                   else if(snapshot.hasError){
                     return Center(
                       child: indicatorLoad(),
                     );
                   }
+
                   return Consumer<ReportProvider>(
                     builder: (context, dataReport, _) {
                       return dataReport != null ? Column(
@@ -159,7 +178,7 @@ class HomePage extends StatelessWidget {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           border:
-                              Border.all(color: PaletteColor.yellow, width: 3),
+                          Border.all(color: PaletteColor.yellow, width: 3),
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                         child: Column(
