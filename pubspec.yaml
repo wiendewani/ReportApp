@@ -31,6 +31,7 @@ dependencies:
   image_picker: ^0.8.0+3
   shared_preferences: ^2.0.6
   http: ^0.13.3
+  flutter_launcher_icons: ^0.9.0
   fdottedline: ^1.0.1
   data_connection_checker: ^0.3.4
 

@@ -11,7 +11,7 @@ import 'package:reportapp/views/ProfileUser/ProfileUserPage.dart';
 class DasboardPage extends StatefulWidget {
   final String idUser;
 
-  DasboardPage({@required this.idUser});
+  DasboardPage({this.idUser});
 
   @override
   _DasboardPageState createState() => _DasboardPageState();

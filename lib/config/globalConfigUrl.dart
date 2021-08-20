@@ -1,5 +1,5 @@
 class GlobalConfigUrl{
-  static String baseUrl = "https://ngalam112.faftech.my.id/";
+  static String baseUrl = "https://techngalam.my.id/";
 
   static String baseUrlApi = baseUrl + "api/";
 

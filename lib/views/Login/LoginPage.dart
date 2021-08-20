@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   sendLogin(BuildContext context) async {
+    print("lalala");
     loadOn();
     int statusCode = await Provider.of<AuthProvider>(context, listen: false)
         .postLogin(_usernameController.text, _passwordController.text);

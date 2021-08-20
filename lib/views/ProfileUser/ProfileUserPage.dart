@@ -8,13 +8,14 @@ import 'package:reportapp/provider/UserProvider.dart';
 import 'package:reportapp/theme/PaletteColor.dart';
 import 'package:reportapp/theme/SpacingDimens.dart';
 import 'package:reportapp/theme/TypographyStyle.dart';
+import 'package:reportapp/views/Dashboard/HomePage/ConfirmationLogoutDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileUserPage extends StatefulWidget {
 
   final String idUser;
 
-  ProfileUserPage({ this.idUser});
+  ProfileUserPage({this.idUser});
 
   @override
   _ProfileUserPageState createState() => _ProfileUserPageState();
@@ -26,6 +27,18 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  signOut(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationLogoutDialog(
+          homePageCtx: context,
+          sheetDialogCtx: context,
+        );
+      },
+    );
   }
 
   Widget _biodataField(String title, String content) {
@@ -57,8 +70,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,78 +86,132 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             ),
           ),
         ),
-
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: SpacingDimens.spacing24,
-          vertical: SpacingDimens.spacing24,
-        ),
-     child: FutureBuilder(
-       future: Future.wait([
-         Provider.of<UsersProvider>(context,listen: false).getUserDetail(
-           widget.idUser
-         )
-       ]),
-       builder: (context,snapshot){
-         if (snapshot.connectionState == ConnectionState.waiting) {
-           return Center(
-             child: indicatorLoad(),
-           );
-         }
-         else if(snapshot.hasError){
-           return Center(
-             child: indicatorLoad(),
-           );
-         }
+          padding: const EdgeInsets.symmetric(
+            horizontal: SpacingDimens.spacing24,
+            vertical: SpacingDimens.spacing24,
+          ),
+          child: FutureBuilder(
+            future: Future.wait([
+              Provider.of<UsersProvider>(context, listen: false)
+                  .getUserDetail(widget.idUser)
+            ]),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: indicatorLoad(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: indicatorLoad(),
+                );
+              }
 
-         return Consumer<UsersProvider>(
-           builder: (context,dataUser,_){
-             return SingleChildScrollView(
-               physics: BouncingScrollPhysics(),
-               child: dataUser != null ? Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 mainAxisAlignment: MainAxisAlignment.start,
-                 children: [
-                   Center(
-                       child: CircleAvatar(
-                         backgroundColor: PaletteColor.grey40,
-                         radius: SpacingDimens.spacing32,
-                         child: Text(
-                           dataUser.userDetail.data.namaPetugas[0].toUpperCase(),
-                           style: TypographyStyle.title.merge(
-                             TextStyle(
-                               fontSize: SpacingDimens.spacing32,
-                             ),
-                           ),
-                         ),
-                       ),
-                   ),
-                   SizedBox(
-                     height: SpacingDimens.spacing16,
-                   ),
-                   Center(child: Text(dataUser.userDetail.data.namaPetugas)),
-                   SizedBox(
-                     height: SpacingDimens.spacing44,
-                   ),
-                   Divider(
-                     color: PaletteColor.grey60,
-                     height: 1,
-                   ),
-                   _biodataField("Username", dataUser.userDetail.data.username),
-                   _biodataField("Nama Instansi", dataUser.userDetail.data.instansi.namaInstansi),
-                   _biodataField("Alamat Instansi", dataUser.userDetail.data.instansi.alamat),
-                   _biodataField("Kontak Instansi", dataUser.userDetail.data.instansi.kontak)
-                 ],
-               ):
-                   Center(
-                     child: Text("Tidak ada internet"),
-                   )
-             );
-           },
-         );
-       },
-     )
+              return Consumer<UsersProvider>(
+                builder: (context, dataUser, _) {
+                  return SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: dataUser != null
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: CircleAvatar(
+                                    backgroundColor: PaletteColor.grey40,
+                                    radius: SpacingDimens.spacing32,
+                                    child: Text(
+                                      dataUser.userDetail.data.namaPetugas[0]
+                                          .toUpperCase(),
+                                      style: TypographyStyle.title.merge(
+                                        TextStyle(
+                                          fontSize: SpacingDimens.spacing32,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: SpacingDimens.spacing16,
+                                ),
+                                Center(
+                                    child: Text(
+                                        dataUser.userDetail.data.namaPetugas)),
+                                SizedBox(
+                                  height: SpacingDimens.spacing44,
+                                ),
+                                Divider(
+                                  color: PaletteColor.grey60,
+                                  height: 1,
+                                ),
+                                _biodataField("Username",
+                                    dataUser.userDetail.data.username),
+                                _biodataField(
+                                    "Nama Instansi",
+                                    dataUser
+                                        .userDetail.data.instansi.namaInstansi),
+                                _biodataField("Alamat Instansi",
+                                    dataUser.userDetail.data.instansi.alamat),
+                                _biodataField("Kontak Instansi",
+                                    dataUser.userDetail.data.instansi.kontak),
+                                SizedBox(
+                                  height: SpacingDimens.spacing16,
+                                ),
+                                Center(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        primary: PaletteColor.primary),
+                                    onPressed: () => signOut(context),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: SpacingDimens.spacing8),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Keluar',
+                                        style: TypographyStyle.subtitle2.merge(
+                                            TextStyle(
+                                                color: PaletteColor.primarybg)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Center(
+                              child: Text("Tidak ada internet"),
+                            ));
+                },
+              );
+            },
+          )),
+    );
+  }
+
+  Widget actionBottomSheet({@required IconData icon, @required String title}) {
+    return Container(
+      color: PaletteColor.primarybg,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: SpacingDimens.spacing16,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 25,
+              color: PaletteColor.primary,
+            ),
+            SizedBox(
+              width: SpacingDimens.spacing24,
+            ),
+            Text(
+              title,
+              style: TypographyStyle.subtitle2,
+            ),
+          ],
+        ),
       ),
     );
   }
